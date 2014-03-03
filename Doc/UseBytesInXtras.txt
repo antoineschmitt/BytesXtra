@@ -1,0 +1,93 @@
+BytesXtra
+v1.0
+Antoine Schmitt - mar 2008
+
+Using Bytes objects in other Xtras
+
+
+1) Summary
+
+You can use Bytes values or create Bytes values in other Xtras and pass them around between Xtras and from and to lingo.
+
+At compile time, you will need the bytesValue.h header file to compile against.
+
+At runtime, you will need the BytesXtra to be present when your Xtra functions that make use of Bytes objects are called.
+
+Used names :
+"BytesXtra" is the name of the Xtra
+"bytes" is the lingo datatype of Bytes values
+"Bytes_IMoaMmXValue" is the Bytes interface class. It is a subclass of the IMoaMmXValue interface class.
+"CLSID_Bytes" is the GUID of the Bytes_IMoaMmXValue interface
+
+
+2) #include
+
+Include the given bytesValue.h header file to your Xtra project.
+
+- locate in your Xtra files, the cpp file that contains the INITGUID macro (usually Cregster.cpp), and add the #include "bytesValue.h" line to this file. This ensures that the CLSID_Bytes GUID is declared (not just defined) in your Xtra.
+
+- in your other Xtra source files that will access or create Bytes objects, also add #include "bytesValue.h"
+
+
+The Bytes_IMoaMmXValue class has the following functions declared in "bytesValue.h":
+int size() // the sizevoid resizeTo(MoaLong newSiz)unsigned char * data() // pointer to the data, use with caution
+unsigned char getAt(int index) // index starting from 1 !void setAt(int index, unsigned char val) // index starting from 1 !void copyDataTo(void * buf, MoaLong bufSiz)void copyDataFrom(void * buf, MoaLong bufSiz)
+
+
+
+3) PIMoaMmXValueUtils
+You need to have a PIMoaMmXValueUtils instance to help convert MoaMmXValue to and from MoaMmValue. For this, you need to link your Xtra against the xsupport.lib library (available in the XDK).
+
+This instance is created on the fly (like in the examples below) or once and for all in you Xtra instance creation function.
+
+
+
+4) get a Bytes object from lingo
+
+If a bytes object is created in lingo ("data = newBytes(10)") and passed to your Xtra. You will need to convert this MoaMmValue to a Bytes_IMoaMmXValue object, using the PIMoaMmXValueUtils object. Then you can access the Bytes_IMoaMmXValue functions.
+
+
+Example :
+
+//---- get bytes from lingo value 1
+
+// get the PIMoaMmXValueUtilsPIMoaMmXValueUtils fpXUtils;MoaError err = pObj->pCallback->QueryInterface(&IID_IMoaMmXValueUtils, (PPMoaVoid)&fpXUtils);
+if (err != kMoaErr_NoErr) return err;
+
+// Check type
+if (!pObj->fpXUtils->valueIsIXValue(&callPtr->pArgs[1]))	return kMoaMmErr_NotIMoaMmXValue;
+
+// our Bytes_IMoaMmXValue interface objet (subclass of IMoaMmXValue)Bytes_IMoaMmXValue *myBytes = NULL;
+
+// Convert value to XValuepObj->fpXUtils->ValueToIXValue(&callPtr->pArgs[1], (PIMoaMmXValue *)&myBytes);
+
+fpXUtils->Release(); // not used anymore// See if it's our type of XValue objectMoaMmValue ilkValue;MoaMmSymbol ilkSym, xvalSym;myBytes->Ilk(NULL, &ilkValue);pObj->pMmValue->ValueToSymbol(&ilkValue, &ilkSym);pObj->pMmValue->ValueRelease(&ilkValue);pObj->pMmValue->StringToSymbol("bytes", &xvalSym);if (xvalSym != ilkSym) {	myBytes->Release();	return kMoaMmErr_ValueTypeMismatch;}// ok, use our objectMoaLong bufLen = myBytes->size();myBytes->copyDataTo(otherBuf, bufLen);
+// etc...
+
+// release our objectmyBytes->Release();//---- end bytes
+5) Create a bytes object and return it to lingo
+The Xtra can create a new Bytes value and return it to lingo very easily using MoaCreateInstance and the CLSID_Bytes, which creates an instance of the Bytes_IMoaMmXValue class.
+
+Example:
+
+// -------- create new bytes data
+Bytes_IMoaMmXValue *pNewBytes = NULL; // our new object
+
+// create iterr = pObj->pCallback->MoaCreateInstance(&CLSID_Bytes, &IID_IMoaMmXValue, (PPMoaVoid)&pNewBytes);
+if (pNewBytes == NULL) {
+	// BytesXtra not present !
+	return kMoaErr_NoErr;
+}
+
+// call Bytes_IMoaMmXValue functions, for example :pNewBytes-> resizeTo(myBytesCount);pNewBytes->copyDataFrom(myBuf, myBytesCount);
+
+
+// return it to lingo
+
+// we need a PIMoaMmXValueUtilsPIMoaMmXValueUtils fpXUtils;MoaError err = pObj->pCallback->QueryInterface(&IID_IMoaMmXValueUtils, (PPMoaVoid)&fpXUtils);
+if (err != kMoaErr_NoErr) return err;
+pObj->fpXUtils->IXValueToValue(pNewBytes, &callPtr->resultValue);
+fpXUtils->Release();pNewBytes->Release();	// now the resultValue is holding this object
+
+// -------- end create new bytes data
+

@@ -1,0 +1,97 @@
+{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf470
+{\fonttbl\f0\fswiss\fcharset77 Helvetica-Bold;\f1\fswiss\fcharset77 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11900\viewh15900\viewkind1\viewscale100
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\b\fs22 \cf0 // ---- bytesXtra API\
+\
+Functions\
+
+\f1\b0 newBytes(int size)\
+-- creates a bytes object of the given size, filled with 0\
+\
+newBytesFromString(string str)\
+-- creates a bytes object by converting the string object\
+
+\f0\b \
+Access read and write using brakets:\
+
+\f1\b0 aBytes[int index]\
+aBytes.data[int index]\
+-- gets/sets the element at given position.\
+-- If set and index > size, increases the size.\
+-- If get and index > size : error\
+\
+aBytes.data[int index1..int index2]\
+(example : aBytes[1..10])\
+-- get : returns a list of the elements between index1 and index2 (included)\
+-- set : sets all the elements to the given rvalue\
+-- If set and index1 or index2 > size, increases the size.\
+
+\f0\b \
+\
+Methods:\
+
+\f1\b0 aBytes.getAt(int index)\
+-- like aBytes[index]\
+\
+aBytes.setAt(int index, int rvalue)\
+-- like aBytes[index] = rvalue\
+\
+aBytes.toString()\
+-- creates a string from a bytes object\
+\
+int aBytes.offset(bytes needleBytes [,int startIndex])\
+-- -- returns the first index (after startIndex if present, default 1) of needleBytes in aBytes, or 0 if not found\
+\
+int aBytes.copyFrom(bytes srcBytes [, int dstOffset [, int bytesCount [, int srcOffset]]])\
+-- copies bytesCount (default : all) bytes from srcOffset (default 1) in srcBytes into aBytes starting at dstOffset (default 1).\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\ql\qnatural\pardirnatural
+\cf0 -- returns the number of bytes copied (0 or bytesCount)\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+\cf0 example : bytes.copyFrom(bytes2) -- copies bytes2\
+example : bytes.copyFrom(bytes2, 3) -- copies bytes2 to position 3\
+example : bytes.copyFrom(bytes2, 3, 5) -- copies 5 first bytes of bytes2 to position 3\
+example : bytes.copyFrom(bytes2, 3, 5, 5) -- copies 5 next bytes of bytes2 to position 3\
+
+\f0\b \
+Properties :\
+
+\f1\b0 int aBytes.size\
+-- returns the size.\
+-- If set, changes the size : If larger, fills with 0s. If smaller, truncates
+\f0\b \
+\
+// -------------------------------\
+\
+// ------ 
+\f1\b0 Autodownloadable packages \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\ql\qnatural\pardirnatural
+\cf0 \
+The BytesXtra is autodownloadable from the internet, so that it is usable inside a Shockwave movie available on a web site.\
+\
+In order provide the BytesXtra for automatic download, follow these instructions:\
+\
+- locate the packages in the delivery that you have received. There should be one package per platform (currently xpku, carbon and w32).\
+\
+- put the packages in a single location on a server. eg:\
+http://www.myserver.com/packs/BytesXtra.xpku (for D11 Mac)\
+http://www.myserver.com/packs/BytesXtra.carb (for MX2004 Mac)\
+http://www.myserver.com/packs/BytesXtra.w32 (for Windows)\
+(Do not put www.schmittmachine.com here, as the packages are *not* autodownloadable from the schmittmachine.com web site. Put them on your web site, alongside your Shockwave movie for example.)\
+\
+- modify the xtrainfo.txt file in the Director folder to reference this location, eg:\
+; BytesXtra Xtra\
+[#namePPC:"BytesXtra", #nameW32:"BytesXtra.x32",#package:"http://www.myserver.com/packs/BytesXtra"]\
+\
+- restart Director\
+\
+- add a reference to the package in your movie:\
+Open a movie that uses BytesXtra. From the Modify\\Movie\\Xtras dialog in Director, select the BytesXtra in the list of xtras.\
+The "Download if needed" checkbox should now be enabled. (If it's not enabled, make sure the filename in xtrainfo.txt matches the actual filename for the xtra.) \
+Click on the checkbox and director will load information from the package file for each platform and add it to the current movie.\
+- publish your shockwave movie, and install it on your server. Each user that plays your Shockwave will automatically dowload the BytesXtra from the http address you have specified.\
+\
+For more information on the Packaging and Autodownload process, check Adobe's web site.\
+}

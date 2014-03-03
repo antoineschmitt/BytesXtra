@@ -1,0 +1,10 @@
+LIBRARY   SCRIPT
+CODE      PRELOAD MOVEABLE DISCARDABLE
+DATA      PRELOAD SINGLE
+EXPORTS
+			DllGetClassObject
+			DllGetInterface
+			DllGetClassForm
+			DllCanUnloadNow
+			DllGetClassInfo
+
